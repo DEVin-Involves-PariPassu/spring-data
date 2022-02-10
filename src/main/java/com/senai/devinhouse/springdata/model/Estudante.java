@@ -1,6 +1,7 @@
 package com.senai.devinhouse.springdata.model;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -30,11 +31,17 @@ public class Estudante {
     // time - (somente hora) - LocalTime
     private LocalDate dataNascimento;
 
+    @Embedded
+    private Endereco endereco;
+
     @Enumerated(EnumType.STRING)
     private Genero genero;
 
     @Convert(converter = YesNoBooleanConverter.class)
     private Boolean ativo;
+
+    @Transient // Informo pro JPA que este atributo não é persistido.
+    private String observacao;
 
     public Long getId() {
         return id;
@@ -92,6 +99,18 @@ public class Estudante {
         this.genero = genero;
     }
 
+    public String getNomeCompleto() {
+        return this.nome + " " + this.ultimoNome;
+    }
+
+    public Endereco getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(Endereco endereco) {
+        this.endereco = endereco;
+    }
+
     @Override
     public String toString() {
         return "Estudante{" +
@@ -99,6 +118,10 @@ public class Estudante {
                 ", nome='" + nome + '\'' +
                 ", ultimoNome='" + ultimoNome + '\'' +
                 ", idade=" + idade +
+                ", dataNascimento=" + dataNascimento +
+                ", endereco=" + endereco +
+                ", genero=" + genero +
+                ", ativo=" + ativo +
                 '}';
     }
 }
