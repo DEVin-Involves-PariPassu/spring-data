@@ -2,7 +2,9 @@ package com.senai.devinhouse.springdata;
 
 import com.senai.devinhouse.springdata.model.Estudante;
 import com.senai.devinhouse.springdata.repository.EstudanteRepository;
+import com.senai.devinhouse.springdata.service.DisciplinaService;
 import com.senai.devinhouse.springdata.service.EstudanteService;
+import com.senai.devinhouse.springdata.service.ProfessorService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,10 +16,16 @@ import java.util.Scanner;
 public class SpringDataApplication implements CommandLineRunner {
 
 	private final EstudanteService estudanteService;
+	private final ProfessorService professorService;
+	private final DisciplinaService disciplinaService;
 	private boolean system = true;
 
-	public SpringDataApplication(EstudanteService estudanteService) {
+	public SpringDataApplication(EstudanteService estudanteService,
+								 ProfessorService professorService,
+								 DisciplinaService disciplinaService) {
 		this.estudanteService = estudanteService;
+		this.professorService = professorService;
+		this.disciplinaService = disciplinaService;
 	}
 
 	public static void main(String[] args) {
@@ -32,6 +40,8 @@ public class SpringDataApplication implements CommandLineRunner {
 			System.out.println("Qual a função que você deseja acessar");
 			System.out.println("0 - Sair");
 			System.out.println("1 - Estudante");
+			System.out.println("2 - Professor");
+			System.out.println("3 - Disciplina");
 
 			Integer function = scanner.nextInt();
 
@@ -39,6 +49,11 @@ public class SpringDataApplication implements CommandLineRunner {
 				case 1:
 					estudanteService.inicial(scanner);
 					break;
+				case 2:
+					professorService.inicial(scanner);
+					break;
+				case 3:
+					disciplinaService.inicial(scanner);
 				default:
 					System.out.println("Finalizando");
 					system = false;
