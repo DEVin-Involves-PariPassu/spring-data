@@ -5,6 +5,8 @@ package com.senai.devinhouse.springdata.model;
 //id_professor integer fk
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Disciplina {
@@ -19,6 +21,21 @@ public class Disciplina {
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "id_professor", referencedColumnName = "id")
     private Professor professor;
+
+    @OneToOne(mappedBy = "disciplina")
+    private DisciplinaMaterial disciplinaMaterial;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "estudantes_disciplinas",
+            joinColumns = @JoinColumn(name = "disciplina_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "estudante_id", referencedColumnName = "id")
+    )
+    private List<Estudante> estudantes = new ArrayList<>();
+
+    public void adicionarEstudante(Estudante estudante) {
+        this.estudantes.add(estudante);
+    }
 
     public Long getId() {
         return id;

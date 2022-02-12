@@ -1,8 +1,10 @@
 package com.senai.devinhouse.springdata.service;
 
 import com.senai.devinhouse.springdata.model.Disciplina;
+import com.senai.devinhouse.springdata.model.Estudante;
 import com.senai.devinhouse.springdata.model.Professor;
 import com.senai.devinhouse.springdata.repository.DisciplinaRepository;
+import com.senai.devinhouse.springdata.repository.EstudanteRepository;
 import com.senai.devinhouse.springdata.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,13 +20,18 @@ public class DisciplinaService {
     @Autowired
     private DisciplinaRepository disciplinaRepository;
 
+    @Autowired
+    private EstudanteRepository estudanteRepository;
+
     public void inicial(Scanner scanner) {
         while(system) {
             System.out.println("Qual ação em disciplina deseja executar");
             System.out.println("0 - Voltar");
             System.out.println("1 - Salvar");
-            System.out.println("2 - Deletar");
-            System.out.println("3 - Visualizar");
+            System.out.println("2 - Atualizar");
+            System.out.println("3 - Deletar");
+            System.out.println("4 - Visualizar");
+            System.out.println("5 - Adicionar estudante a disciplina");
 
             int action = scanner.nextInt();
 
@@ -32,17 +39,75 @@ public class DisciplinaService {
                 case 1 :
                     salvar(scanner);
                     break;
-                case 2 :
+                case 2:
+                    atualizar(scanner);
+                    break;
+                case 3 :
                     deletar(scanner);
                     break;
-                case 3:
+                case 4:
                     visualizar();
+                    break;
+                case 5:
+                    adicionarEstudante(scanner);
                     break;
                 default:
                     system = false;
                     break;
             }
         }
+    }
+
+    private void adicionarEstudante(Scanner scanner) {
+        System.out.println("Informe o id da disciplina");
+
+        Long idDisciplina = scanner.nextLong();
+
+        Optional<Disciplina> disciplinaOptional = disciplinaRepository.findById(idDisciplina);
+
+        // early return
+        if(disciplinaOptional.isEmpty()) {
+            System.out.println("O id informado é inválido");
+            return;
+        }
+
+        System.out.println("Informe o id do aluno");
+
+        Long idAluno = scanner.nextLong();
+
+        Optional<Estudante> estudanteOptional = estudanteRepository.findById(idAluno);
+
+        // early return
+        if(estudanteOptional.isEmpty()) {
+            System.out.println("O id informado é inválido");
+            return;
+        }
+
+        Disciplina disciplina = disciplinaOptional.get();
+        disciplina.adicionarEstudante(estudanteOptional.get());
+
+        disciplinaRepository.save(disciplina);
+    }
+
+    private void atualizar(Scanner scanner) {
+        System.out.println("Informe o id da disciplina que quer atualizar");
+
+        Long id = scanner.nextLong();
+        Optional<Disciplina> disciplinaOptional = disciplinaRepository.findById(id);
+
+        // early return
+        if(disciplinaOptional.isEmpty()) {
+            System.out.println("O id informado é inválido");
+            return;
+        }
+
+        System.out.println("Informe a descrição para atualizar");
+        scanner.nextLine();
+        String descricao = scanner.nextLine();
+        Disciplina disciplina = disciplinaOptional.get();
+        disciplina.setDescricao(descricao);
+
+        disciplinaRepository.save(disciplina);
     }
 
     private void deletar(Scanner scanner) {
@@ -79,13 +144,4 @@ public class DisciplinaService {
         disciplinaRepository.save(disciplina);
     }
 
-    public void update() {
-        Optional<Disciplina> disciplina1 = disciplinaRepository.findById(5L);
-        disciplina1.get().setDescricao();
-        Disciplina disciplina = new Disciplina();
-        disciplina.setId(5L);
-        disciplina.setProfessor();
-
-        disciplinaRepository.save(disciplina);
-    }
 }

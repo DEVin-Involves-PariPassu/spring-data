@@ -5,6 +5,11 @@ import com.senai.devinhouse.springdata.model.Estudante;
 import com.senai.devinhouse.springdata.model.EstudanteProjecao;
 import com.senai.devinhouse.springdata.model.Genero;
 import com.senai.devinhouse.springdata.repository.EstudanteRepository;
+import com.senai.devinhouse.springdata.repository.SpecificationsEstudante;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -32,6 +37,7 @@ public class EstudanteService {
             System.out.println("5 - Buscar por idade projeção");
             System.out.println("6 - Buscar estudantes com endereço");
             System.out.println("7 - Buscar estudantes por cidade");
+            System.out.println("8 - Busca dinamica");
 
             int action = scanner.nextInt();
 
@@ -40,7 +46,7 @@ public class EstudanteService {
                     salvar(scanner);
                     break;
                 case 2:
-                    visualizar();
+                    visualizar(scanner);
                     break;
                 case 3:
                     buscarPorNome(scanner);
@@ -57,11 +63,35 @@ public class EstudanteService {
                 case 7:
                     buscarEstudantesPorCidade(scanner);
                     break;
+                case 8:
+                    buscaDinamica(scanner);
+                    break;
                 default:
                     system = false;
                     break;
             }
         }
+    }
+
+    private void buscaDinamica(Scanner scanner) {
+        System.out.println("Informe o nome");
+        String nome = scanner.next();
+        if(nome.equals("NULL")) {
+            nome = null;
+        }
+
+        System.out.println("Infome a idade");
+        Integer idade = scanner.nextInt();
+        if(idade == 0) {
+            idade = null;
+        }
+
+        List<Estudante> estudantes = estudanteRepository.findAll(Specification.where(
+                SpecificationsEstudante.nome(nome)
+                        .or(SpecificationsEstudante.idadeMaiorQue(idade))
+        ));
+
+        estudantes.forEach(System.out::println);
     }
 
     private void buscarEstudantesPorCidade(Scanner scanner) {
@@ -131,8 +161,16 @@ public class EstudanteService {
         estudanteRepository.save(estudante);
     }
 
-    private void visualizar() {
-        Iterable<Estudante> estudantes = estudanteRepository.findAll();
-        estudantes.forEach(System.out::println);
+    private void visualizar(Scanner scanner) {
+        System.out.println("Qual página deseja visualizar");
+
+        int pagina = scanner.nextInt();
+
+        PageRequest pageRequest = PageRequest.of(pagina, 2, Sort.by("nome"));
+        Page<Estudante> resultado = estudanteRepository.findAll(pageRequest);
+        System.out.println("Total de elementos: " + resultado.getTotalElements());
+        System.out.println("Total de páginas: " + resultado.getTotalPages());
+        resultado.get().forEach(System.out::println);
+
     }
 }
